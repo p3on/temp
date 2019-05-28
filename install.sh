@@ -1,8 +1,8 @@
 #!/bin/bash
 ################################	PREINSTALLATION		################################
-read -p "User to be added to sudo group" user
+read -p "User to be added to sudo group: " user
 read -p "Install nginx / php / mysql? [y/n]: " webinstall
-if [$webinstall == 'y']; then
+if [$webinstall == "y"]; then
 	read -p "enter mysql-server password: " pw
 fi
 
@@ -22,16 +22,11 @@ apt install -y qemu-kvm libvirt-clients libvirt-daemon-system # Virtualbox alter
 adduser $user libvirt
 adduser $user libvirt-qemu
 
-
-## zsh customization
-chsh -s "$(command -v zsh)" "$user" # change default shell for user
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
-
 ## nginx / mysql / php
-if [$webinstall == 'y']; then
+if [$webinstall == "y"]; then
 	debconf-set-selections <<< 'mysql-server mysql-server/root_password password $pw'
 	debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password $pw'
-	apt install -y nginx php7.3-fpm php7.3-mysql mysql-server
+	apt install -y nginx php7.3-fpm php7.3-mysql mysql-common
 fi
 
 ## Software with deb packages
@@ -50,6 +45,8 @@ curl -s https://updates.signal.org/desktop/apt/keys.asc | apt-key add - # signal
 
 apt update && apt install -y typora signal-desktop
 
-
+## zsh customization
+chsh -s "$(command -v zsh)" "$user" # change default shell for user
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 
 export DEBIAN_FRONTEND='dialog'
