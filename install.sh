@@ -2,6 +2,8 @@
 ################################	PREINSTALLATION		################################
 read -p "User to be added to sudo group: " user
 read -p "Install nginx / php / mysql? [y/n]: " webinstall
+read -p "Installing on a Laptop? [y/n]" laptop
+
 if [$webinstall == "y"]; then
 	read -p "enter mysql-server password: " pw
 fi
@@ -15,12 +17,13 @@ apt install sudo
 usermod -aG sudo $user
 
 ################################	SOFTWARE		################################
-## Installing basic software
-apt install -y git curl vlc gcc gdb apt-transport-https wireshark zsh terminator
-apt install -y qemu-kvm libvirt-clients libvirt-daemon-system # Virtualbox alternative
+## Driver installation
+if [$laptop == "y"]; then
+    apt install firmware-linux-nonfree firmware-iwlwifi
+fi
 
-adduser $user libvirt
-adduser $user libvirt-qemu
+## Installing basic software
+apt install -y git curl vlc gcc gdb apt-transport-https wireshark zsh terminator tldr
 
 ## nginx / mysql / php
 if [$webinstall == "y"]; then
@@ -32,10 +35,8 @@ fi
 ## Software with deb packages
 echo "Downloading deb packages..."
 curl -L https://go.microsoft.com/fwlink/?LinkID=760868 -o code.deb
-curl -L https://www.dropbox.com/download?dl=packages/ubuntu/dropbox_2019.02.14_amd64.deb -o dropbox.deb
 
 dpkg -i code.deb
-dpkg -i dropbox.deb
 
 apt install -f
 
@@ -48,5 +49,29 @@ apt update && apt install -y typora signal-desktop
 ## zsh customization
 chsh -s "$(command -v zsh)" "$user" # change default shell for user
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+
+## looks and feel, desktop
+apt-get install gnome-core
+
+git clone https://github.com/EliverLara/Ant-Bloody.git
+mv Ant-Bloody /usr/share/themes
+gsettings set org.gnome.desktop.interface gtk-theme "Ant-Bloody"
+gsettings set org.gnome.desktop.wm.preferences theme "Ant-Bloody"
+
+git clone https://github.com/PapirusDevelopmentTeam/papirus-icon-theme.git
+mv papirus-icon-theme/Papirus /usr/share/icons
+
+gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "[\
+'/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom4/', \
+'/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom7/' \
+]"
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom4/ name "Terminator"
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom4/ command "terminator"
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom4/ binding "<SUPER>r"
+
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom7/ name "Explorer"
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom7/ command "nautilus"
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom7/ binding "<SUPER>e"
+
 
 export DEBIAN_FRONTEND='dialog'
