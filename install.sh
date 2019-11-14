@@ -60,6 +60,7 @@ gsettings set org.gnome.desktop.wm.preferences theme "Ant-Bloody"
 
 git clone https://github.com/PapirusDevelopmentTeam/papirus-icon-theme.git
 mv papirus-icon-theme/Papirus /usr/share/icons
+rm -rf ./papirus-icon-theme
 
 gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "[\
 '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom4/', \
